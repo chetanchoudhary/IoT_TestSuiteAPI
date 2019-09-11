@@ -1,4 +1,4 @@
-def simulation(broker, topic):
+def simulation(broker, topic, frequency, timeInterval):
     import sys
     import paho.mqtt.client as mqtt
     import time
@@ -46,9 +46,12 @@ def simulation(broker, topic):
         a = random.randint(10, 100)
         return a
 # Sending data to Thingworx Cloud Continously using MQTT
-    while True:
+    i = 0
+    while i < frequency:
         humidity = humidityGen()
         temperature = tempGen()
         test = {"temperature": str(temperature), "humidity": str(humidity)}
         testJson = json.dumps(test)
         tempHumidityChange(testJson)
+        i = i + 1
+        time.sleep(timeInterval)

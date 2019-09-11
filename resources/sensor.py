@@ -65,7 +65,9 @@ class SensorByName(Resource):
         if sensor:
             sensor = sensor.json()
             print(sensor['broker'])
-            return simulation(sensor['broker'], sensor['topic'])
+            simulation(sensor['broker'], sensor['topic'],
+                       sensor['frequency'], sensor['timeInterval'])
+            return {"message": "Simulation Completed"}
         else:
             return {"message": "Not Found"}
 #     parser = reqparse.RequestParser()
