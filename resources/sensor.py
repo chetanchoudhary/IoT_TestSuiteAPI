@@ -2,7 +2,8 @@ from flask import Flask, url_for, request, jsonify
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from models.sensor import SensorModel
-from simulation.thingworxSim import simulation
+from simulation.thingworxSim import simulationThingworx
+import json
 
 
 class Sensor(Resource):
@@ -12,13 +13,7 @@ class Sensor(Resource):
         "name", type=str, required=True, help="This field cannot be left blank!"
     )
     parser.add_argument(
-        "broker", type=str, required=True, help="This field cannot be left blank!"
-    )
-    parser.add_argument(
-        "topic", type=str, required=True, help="This field cannot be left blank!"
-    )
-    parser.add_argument(
-        "appKey", type=str, required=True, help="This field cannot be left blank!"
+        "connection", type=str, required=True, help="This field cannot be left blank!"
     )
     parser.add_argument(
         "format", type=str, required=True, help="This field cannot be left blank!"
@@ -28,6 +23,12 @@ class Sensor(Resource):
     )
     parser.add_argument(
         "frequency", type=int, required=True, help="This field cannot be left blank!"
+    )
+    parser.add_argument(
+        "minRange", type=int, required=True, help="This field cannot be left blank!"
+    )
+    parser.add_argument(
+        "maxRange", type=int, required=True, help="This field cannot be left blank!"
     )
 
     def get(self):
@@ -46,8 +47,8 @@ class Sensor(Resource):
                 )
             }
 
-        sensor = SensorModel(data["name"], data["broker"], data["topic"],
-                             data["appKey"], data["format"], data["timeInterval"], data["frequency"])
+        sensor = SensorModel(data["name"], data["connection"], data["format"],
+                             data["timeInterval"], data["frequency"], data["minRange"], data["maxRange"])
 
         try:
             sensor.save_to_db()
@@ -64,9 +65,11 @@ class SensorByName(Resource):
         sensor = SensorModel.find_by_name(name)
         if sensor:
             sensor = sensor.json()
-            print(sensor['broker'])
-            simulation(sensor['broker'], sensor['topic'],
-                       sensor['frequency'], sensor['timeInterval'])
+            print(sensor['connection'])
+            connectionDict = json.loads(sensor['connection'])
+            # print(connectionDict)
+            simulationThingworx(connectionDict,
+                                sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
             return {"message": "Simulation Completed"}
         else:
             return {"message": "Not Found"}

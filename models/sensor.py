@@ -3,28 +3,28 @@ from db import db
 
 class SensorModel(db.Model):
 
-    __tablename__ = "thingworx"
+    __tablename__ = "sensors"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
-    broker = db.Column(db.String(60))
-    topic = db.Column(db.String(60))
-    appKey = db.Column(db.String(60))
     format = db.Column(db.String(10))
     timeInterval = db.Column(db.Integer)
     frequency = db.Column(db.Integer)
+    connection = db.Column(db.String(500))
+    minRange = db.Column(db.Integer)
+    maxRange = db.Column(db.Integer)
 
-    def __init__(self, name, broker, topic, appKey, _format, timeInterval, frequency):
+    def __init__(self, name, connection, _format, timeInterval, frequency, minRange, maxRange):
         self.name = name
-        self.broker = broker
-        self.topic = topic
-        self.appKey = appKey
+        self.connection = connection
         self.format = _format
         self.timeInterval = timeInterval
         self.frequency = frequency
+        self.minRange = minRange
+        self.maxRange = maxRange
 
     def json(self):
-        return {"name": self.name, "broker": self.broker, "topic": self.topic, "appKey": self.appKey, "format": self.format, "timeInterval": self.timeInterval, "frequency": self.frequency}
+        return {"name": self.name, "connection": self.connection, "format": self.format, "timeInterval": self.timeInterval, "frequency": self.frequency, "minRange": self.minRange, "maxRange": self.maxRange}
 
     def save_to_db(self):
         db.session.add(self)

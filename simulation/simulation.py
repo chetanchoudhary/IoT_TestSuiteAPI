@@ -1,4 +1,4 @@
-def simulationThingworx(connection, frequency, timeInterval, minRange, maxRange):
+def simulation(connection, frequency, timeInterval, minRange, maxRange):
     import sys
     import paho.mqtt.client as mqtt
     import time
@@ -24,7 +24,7 @@ def simulationThingworx(connection, frequency, timeInterval, minRange, maxRange)
 # Publishing Data to Cloud
 
 
-    def tempHumidityChange(test):
+    def valueChange(test):
         client.on_message = on_message
         print("Connecting to Broker : ", broker)
         client.connect(broker)
@@ -40,20 +40,15 @@ def simulationThingworx(connection, frequency, timeInterval, minRange, maxRange)
 
 # Getting Temperature and Humidity from DHT11 sensor.
 
-    def tempGen():
-        a = random.randint(minRange, maxRange)
-        return a
-
-    def humidityGen():
+    def valueGen():
         a = random.randint(minRange, maxRange)
         return a
 # Sending data to Thingworx Cloud Continously using MQTT
     i = 0
     while i < frequency:
-        humidity = humidityGen()
-        temperature = tempGen()
-        test = {"temperature": str(temperature), "humidity": str(humidity)}
+        value = valueGen
+        test = {"value": str(value)}
         testJson = json.dumps(test)
-        tempHumidityChange(testJson)
+        valueChange(testJson)
         i = i + 1
         time.sleep(timeInterval)
