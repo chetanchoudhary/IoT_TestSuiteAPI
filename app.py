@@ -5,7 +5,7 @@ from flask import Flask, url_for, request, jsonify
 from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required, current_identity, timedelta
 
-from resources.sensor import Sensor, SensorByName
+from resources.sensor import Sensor, SensorByName, UpdateSensorRange, UpdateSensorFrequencyInterval
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
@@ -38,7 +38,9 @@ def create_tables():
 
 api.add_resource(Sensor, "/api/v1/sensors")
 api.add_resource(SensorByName, "/api/v1/sensors/<string:name>")
-
+api.add_resource(UpdateSensorRange, "/api/v1/sensors/<string:name>/range")
+api.add_resource(UpdateSensorFrequencyInterval,
+                 "/api/v1/sensors/<string:name>/time_frequency")
 
 if __name__ == "__main__":
     from db import db

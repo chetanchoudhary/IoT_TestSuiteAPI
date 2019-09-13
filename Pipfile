@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+autopep8 = "*"
+
+[packages]
+paho-mqtt = "*"
+Flask = "*"
+Flask-JWT = "*"
+Flask-RESTful = "*"
+Flask-SQLAlchemy = "*"
+pep8 = "*"
+
+[requires]
+python_version = "3.7"
