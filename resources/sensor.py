@@ -15,30 +15,31 @@ class Sensor(Resource):
 
     parser = reqparse.RequestParser()
     parser.add_argument(
-        "name", type=str, required=True, help="This field cannot be left blank!"
+        "name", type=str, required=True, help="Please add the name of the Sensor !"
     )
     parser.add_argument("cloud", type=str, required=True,
-                        help="This field cannot be left blank!")
+                        help="Please add the cloud on which you want to work !")
     parser.add_argument(
-        "connection", type=str, required=True, help="This field cannot be left blank!"
+        "connection", type=str, required=True, help="Please add the connection Parameters !"
     )
     parser.add_argument(
-        "format", type=str, required=True, help="This field cannot be left blank!"
+        "format", type=str, required=True, help="Please add in which format do you want to send Data !"
     )
     parser.add_argument(
-        "timeInterval", type=int, required=True, help="This field cannot be left blank!"
+        "timeInterval", type=int, required=True, help="Please add the Time Interval between data simulations !"
     )
     parser.add_argument(
-        "frequency", type=int, required=True, help="This field cannot be left blank!"
+        "frequency", type=int, required=True, help="Please add how many times you want to simulate the sensor Behaviour !"
     )
     parser.add_argument(
-        "minRange", type=int, required=True, help="This field cannot be left blank!"
+        "minRange", type=int, required=True, help="Please add the minimum range !"
     )
     parser.add_argument(
-        "maxRange", type=int, required=True, help="This field cannot be left blank!"
+        "maxRange", type=int, required=True, help="Please add the maximum range !"
     )
 
     def get(self):
+        # Try except block and Authentication to be added
         return {"sensors": list(map(lambda x: x.json(), SensorModel.query.all()))}
 
     def post(self):
@@ -60,7 +61,7 @@ class Sensor(Resource):
         try:
             sensor.save_to_db()
         except:
-            return {"message": "An error occurred inserting the item."}
+            return {"message": "An error occurred while adding the sensor, please try again with correct parameters."}
 
         return sensor.json(), 201
         # else:
@@ -72,23 +73,25 @@ class SensorByName(Resource):
         sensor = SensorModel.find_by_name(name)
         if sensor:
             sensor = sensor.json()
-            print(sensor['connection'])
-            connectionDict = json.loads(sensor['connection'])
+            connection = sensor['connection']
+            connectionDict = json.loads(connection)
             # print(connectionDict)
-            if sensor['cloud'] == "thingworx":
-                simulationThingworx(
-                    connectionDict, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
-            elif sensor['cloud'] == "aws":
-                simulationAWS(connectionDict)
-            elif sensor['cloud'] == "azure":
-                simulationAZURE(connectionDict)
-            else:
-                return {"message": "We don't support simulation for this cloud."}
+            try:
+                if sensor['cloud'] == "thingworx":
+                    simulationThingworx(
+                        connectionDict, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
+                elif sensor['cloud'] == "aws":
+                    simulationAWS(connectionDict)
+                elif sensor['cloud'] == "azure":
+                    simulationAZURE(connectionDict)
+                else:
+                    return {"message": "We don't support simulation for this cloud."}
 
-            return {"message": "Simulation Completed"}
-
+                return {"message": "Simulation Completed"}
+            except Exception:
+                return {"message": "Something went wrong, Please check the cloud server and try again."}
         else:
-            return {"message": "Not Found"}
+            return {"message": "Sensor Not Found"}, 404
 #     parser = reqparse.RequestParser()
 #     parser.add_argument(
 #         "value", type=int, required=True, help="This field cannot be left blank!"
@@ -101,7 +104,7 @@ class SensorByName(Resource):
         sensor = SensorModel.find_by_name(name)
         if sensor:
             return sensor.json()
-        return {"message": "Item not found"}, 404
+        return {"message": "Sensor not found"}, 404
 
 #     @jwt_required()
     def delete(self, name):
@@ -113,6 +116,8 @@ class SensorByName(Resource):
         if sensor:
             sensor.delete_from_db()
             return {"message": "Sensor deleted"}
+        else:
+            return {"message": "Sensor not found"}
 #         else:
 #             return {"message": "You do not have ADMIN Rights"}, 405
 
@@ -144,13 +149,16 @@ class UpdateSensorRange(Resource):
         data = UpdateSensorRange.parser.parse_args()
         sensor = SensorModel.find_by_name(name)
 
-        if sensor is None:
-            return {"message": "Sensor not Found !"}
-        else:
-            sensor.minRange = data["minRange"]
-            sensor.maxRange = data["maxRange"]
-            sensor.save_to_db()
-            return sensor.json()
+        try:
+            if sensor is None:
+                return {"message": "Sensor not Found !"}
+            else:
+                sensor.minRange = data["minRange"]
+                sensor.maxRange = data["maxRange"]
+                sensor.save_to_db()
+                return sensor.json()
+        except Exception as error:
+            return {"message": error}
 
 
 class UpdateSensorFrequencyInterval(Resource):
@@ -166,11 +174,13 @@ class UpdateSensorFrequencyInterval(Resource):
     def put(self, name):
         data = UpdateSensorFrequencyInterval.parser.parse_args()
         sensor = SensorModel.find_by_name(name)
-
-        if sensor is None:
-            return {"message": "Sensor not Found !"}
-        else:
-            sensor.frequency = data["frequency"]
-            sensor.timeInterval = data["timeInterval"]
-            sensor.save_to_db()
-            return sensor.json()
+        try:
+            if sensor is None:
+                return {"message": "Sensor not Found !"}
+            else:
+                sensor.frequency = data["frequency"]
+                sensor.timeInterval = data["timeInterval"]
+                sensor.save_to_db()
+                return sensor.json()
+        except Exception as error:
+            return {"message": error}
