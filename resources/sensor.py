@@ -2,7 +2,7 @@ import json
 
 from flask import Flask, url_for, request, jsonify
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required, current_identity
+
 
 from models.sensor import SensorModel
 
@@ -92,21 +92,13 @@ class SensorByName(Resource):
                 return {"message": "Something went wrong, Please check the cloud server and try again."}
         else:
             return {"message": "Sensor Not Found"}, 404
-#     parser = reqparse.RequestParser()
-#     parser.add_argument(
-#         "value", type=int, required=True, help="This field cannot be left blank!"
-#     )
 
-#     TABLE_NAME = "sensors"
-
-#     @jwt_required()
     def get(self, name):
         sensor = SensorModel.find_by_name(name)
         if sensor:
             return sensor.json()
         return {"message": "Sensor not found"}, 404
 
-#     @jwt_required()
     def delete(self, name):
         #         user = current_identity
         #         print(user.access)
@@ -118,21 +110,6 @@ class SensorByName(Resource):
             return {"message": "Sensor deleted"}
         else:
             return {"message": "Sensor not found"}
-#         else:
-#             return {"message": "You do not have ADMIN Rights"}, 405
-
-#     @jwt_required()
-    # def put(self, name):
-    #     data = SensorByName.parser.parse_args()
-    #     sensor = SensorModel.find_by_name(name)
-
-    #     if sensor is None:
-    #         sensor = SensorModel(name, data["value"])
-    #     else:
-    #         sensor.value = data["value"]
-
-    #         sensor.save_to_db()
-    #         return sensor.json()
 
 
 class UpdateSensorRange(Resource):

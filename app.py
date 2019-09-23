@@ -3,9 +3,9 @@ import json
 
 from flask import Flask, url_for, request, jsonify
 from flask_restful import Resource, Api, reqparse
-from flask_jwt import JWT, jwt_required, current_identity, timedelta
-
+from flask_jwt_extended import JWTManager
 from resources.sensor import Sensor, SensorByName, UpdateSensorRange, UpdateSensorFrequencyInterval
+from resources.user import UserLogin, UserRegister
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
@@ -19,6 +19,7 @@ def create_tables():
     db.create_all()
 
 
+jwt = JWTManager(app)
 # jwt = JWT(app, authenticate, identity_function)
 # app.config["JWT_EXPIRATION_DELTA"] = timedelta(
 #     seconds=1800
@@ -41,6 +42,8 @@ api.add_resource(SensorByName, "/api/v1/sensors/<string:name>")
 api.add_resource(UpdateSensorRange, "/api/v1/sensors/<string:name>/range")
 api.add_resource(UpdateSensorFrequencyInterval,
                  "/api/v1/sensors/<string:name>/time_frequency")
+api.add_resource(UserRegister, "/api/v1/user")
+api.add_resource(UserLogin, "/api/v1/auth")
 
 if __name__ == "__main__":
     from db import db

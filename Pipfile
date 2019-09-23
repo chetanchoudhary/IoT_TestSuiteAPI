@@ -10,10 +10,10 @@ autopep8 = "*"
 [packages]
 paho-mqtt = "*"
 Flask = "*"
-Flask-JWT = "*"
 Flask-RESTful = "*"
 Flask-SQLAlchemy = "*"
 pep8 = "*"
+flask-jwt-extended = "*"
 
 [requires]
 python_version = "3.7"
