@@ -63,7 +63,7 @@ class Sensor(Resource):
         except:
             return {"message": "An error occurred while adding the sensor, please try again with correct parameters."}
 
-        return sensor.json(), 201
+        return {"message": "Sensor Successfully Created !", "sensor": sensor.json(), "statusCode": 201}, 201
         # else:
         #     return {"message": "You do not have ADMIN Rights"}, 405
 
@@ -96,8 +96,8 @@ class SensorByName(Resource):
     def get(self, name):
         sensor = SensorModel.find_by_name(name)
         if sensor:
-            return sensor.json()
-        return {"message": "Sensor not found"}, 404
+            return sensor.json(),200
+        return {"message": "Sensor not found", "statusCode" : 404}, 404
 
     def delete(self, name):
         #         user = current_identity
@@ -133,31 +133,47 @@ class UpdateSensorRange(Resource):
                 sensor.minRange = data["minRange"]
                 sensor.maxRange = data["maxRange"]
                 sensor.save_to_db()
-                return sensor.json()
+                return {"message": "Frequency has been updated.", "sensor": sensor.json()}
         except Exception as error:
             return {"message": error}
 
 
-class UpdateSensorFrequencyInterval(Resource):
+class UpdateSensorFrequency(Resource):
     parser = reqparse.RequestParser()
 
     parser.add_argument(
         "frequency", type=int, required=True, help="This field cannot be left blank!"
     )
-    parser.add_argument(
-        "timeInterval", type=int, required=True, help="This field cannot be left blank!"
-    )
 
     def put(self, name):
-        data = UpdateSensorFrequencyInterval.parser.parse_args()
+        data = UpdateSensorFrequency.parser.parse_args()
         sensor = SensorModel.find_by_name(name)
         try:
             if sensor is None:
                 return {"message": "Sensor not Found !"}
             else:
                 sensor.frequency = data["frequency"]
+                sensor.save_to_db()
+                return {"message": "Frequency has been updated.", "sensor": sensor.json()}
+        except Exception as error:
+            return {"message": error}
+
+
+class UpdateSensorTimeInterval(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+        "timeInterval", type=int, required=True, help="This field cannot be left blank!"
+    )
+
+    def put(self, name):
+        data = UpdateSensorTimeInterval.parser.parse_args()
+        sensor = SensorModel.find_by_name(name)
+        try:
+            if sensor is None:
+                return {"message": "Sensor not Found !"}
+            else:
                 sensor.timeInterval = data["timeInterval"]
                 sensor.save_to_db()
-                return sensor.json()
+                return {"message": "Time Interval has been updated.", "sensor": sensor.json()}
         except Exception as error:
             return {"message": error}

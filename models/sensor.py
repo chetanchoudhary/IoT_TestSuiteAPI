@@ -26,7 +26,7 @@ class SensorModel(db.Model):
         self.maxRange = maxRange
 
     def json(self):
-        return {"name": self.name, "cloud": self.cloud, "connection": self.connection, "format": self.format, "timeInterval": self.timeInterval, "frequency": self.frequency, "minRange": self.minRange, "maxRange": self.maxRange}
+        return {"id": self.id, "name": self.name, "cloud": self.cloud, "connection": self.connection, "format": self.format, "timeInterval": self.timeInterval, "frequency": self.frequency, "minRange": self.minRange, "maxRange": self.maxRange}
 
     def save_to_db(self):
         db.session.add(self)
