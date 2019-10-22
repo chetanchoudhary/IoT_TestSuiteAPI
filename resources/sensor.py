@@ -199,6 +199,6 @@ class UploadCertificate(Resource):
             certificate_path = upload_support.save_certificate(
                 request.files['certificate'], folder=folder)
             print("File saved to: ", certificate_path)
-            return {"message": "Upload Successful"}, 201
+            return {"message": "Upload Successful", "statusCode": 201}, 201
         except Exception as error:
             return {"message": error}
