@@ -1,14 +1,21 @@
 import json
+import os
 
-from flask import Flask, url_for, request, jsonify
+from flask import Flask, url_for, request, jsonify, send_file, request
 from flask_restful import Resource, reqparse
 
 
 from models.sensor import SensorModel
 
 from simulation.thingworxSim import simulationThingworx
-from simulation.awsSim import simulationAWS
+
 from simulation.azureSim import simulationAZURE
+
+from simulation.awsSimSample import simulationAWSSample
+
+
+from libs import upload_support
+from werkzeug.datastructures import FileStorage
 
 
 class Sensor(Resource):
@@ -81,14 +88,18 @@ class SensorByName(Resource):
                     simulationThingworx(
                         connectionDict, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
                 elif sensor['cloud'] == "aws":
-                    simulationAWS(connectionDict)
+
+                    simulationAWSSample(
+                        connectionDict, name, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
+
                 elif sensor['cloud'] == "azure":
                     simulationAZURE(connectionDict)
                 else:
                     return {"message": "We don't support simulation for this cloud."}
 
                 return {"message": "Simulation Completed"}
-            except Exception:
+            except Exception as error:
+                print(error)
                 return {"message": "Something went wrong, Please check the cloud server and try again."}
         else:
             return {"message": "Sensor Not Found"}, 404
@@ -96,8 +107,8 @@ class SensorByName(Resource):
     def get(self, name):
         sensor = SensorModel.find_by_name(name)
         if sensor:
-            return sensor.json(),200
-        return {"message": "Sensor not found", "statusCode" : 404}, 404
+            return sensor.json(), 200
+        return {"message": "Sensor not found", "statusCode": 404}, 404
 
     def delete(self, name):
         #         user = current_identity
@@ -175,5 +186,19 @@ class UpdateSensorTimeInterval(Resource):
                 sensor.timeInterval = data["timeInterval"]
                 sensor.save_to_db()
                 return {"message": "Time Interval has been updated.", "sensor": sensor.json()}
+        except Exception as error:
+            return {"message": error}
+
+
+class UploadCertificate(Resource):
+    def post(self, name):
+
+        folder = f"{name}"
+        try:
+            # save(self, storage, folder=None, name=None)
+            certificate_path = upload_support.save_certificate(
+                request.files['certificate'], folder=folder)
+            print("File saved to: ", certificate_path)
+            return {"message": "Upload Successful"}, 201
         except Exception as error:
             return {"message": error}

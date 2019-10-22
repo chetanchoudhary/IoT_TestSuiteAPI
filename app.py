@@ -5,14 +5,21 @@ from flask_cors import CORS
 from flask import Flask, url_for, request, jsonify
 from flask_restful import Resource, Api, reqparse
 from flask_jwt_extended import JWTManager
-from resources.sensor import Sensor, SensorByName, UpdateSensorRange, UpdateSensorFrequency, UpdateSensorTimeInterval
+from resources.sensor import Sensor, SensorByName, UpdateSensorRange, UpdateSensorFrequency, UpdateSensorTimeInterval, UploadCertificate
 from resources.user import UserLogin, UserRegister
+from flask_uploads import configure_uploads, patch_request_class
+from libs.upload_support import CERTIFICATE_SET
 
 app = Flask(__name__)
 CORS(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///data.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["UPLOADED_CERTIFICATES_DEST"] = os.path.join(
+    "static", "certificates")
+
 app.secret_key = "chetan"
+
+configure_uploads(app, CERTIFICATE_SET)
 api = Api(app)
 
 
@@ -31,6 +38,10 @@ api.add_resource(UpdateSensorFrequency,
                  "/api/v1/sensors/<string:name>/frequency")
 api.add_resource(UpdateSensorTimeInterval,
                  "/api/v1/sensors/<string:name>/timeInterval")
+
+api.add_resource(UploadCertificate,
+                 "/api/v1/sensors/<string:name>/uploadCertificate")
+
 api.add_resource(UserRegister, "/api/v1/user")
 api.add_resource(UserLogin, "/api/v1/auth")
 
