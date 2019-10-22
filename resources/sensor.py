@@ -11,7 +11,7 @@ from simulation.thingworxSim import simulationThingworx
 
 from simulation.azureSim import simulationAZURE
 
-from simulation.awsSimSample import simulationAWSSample
+from simulation.awsSim import simulationAWS
 
 
 from libs import upload_support
@@ -89,7 +89,7 @@ class SensorByName(Resource):
                         connectionDict, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
                 elif sensor['cloud'] == "aws":
 
-                    simulationAWSSample(
+                    simulationAWS(
                         connectionDict, name, sensor['frequency'], sensor['timeInterval'], sensor['minRange'], sensor['maxRange'])
 
                 elif sensor['cloud'] == "azure":

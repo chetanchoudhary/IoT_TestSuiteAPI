@@ -1,4 +1,4 @@
-def simulationAWSSample(connection, deviceName, frequency, timeInterval, minRange, maxRange):
+def simulationAWS(connection, deviceName, frequency, timeInterval, minRange, maxRange):
     # from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
     from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
     from pathlib import Path
