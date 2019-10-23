@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 from flask import Flask, url_for, request, jsonify, send_file, request
 from flask_restful import Resource, reqparse
@@ -200,5 +201,61 @@ class UploadCertificate(Resource):
                 request.files['certificate'], folder=folder)
             print("File saved to: ", certificate_path)
             return {"message": "Upload Successful", "statusCode": 201}, 201
+        except Exception as error:
+            return {"message": error}
+
+
+class RootCAFileCheck(Resource):
+    def get(self, name):
+        path = Path('static/certificates/' + name + '/root-CA.crt')
+        result = path.exists()
+        if result == True:
+            return {"message": "RootCA File Exists", "exists": True}, 200
+        else:
+            return {"message": "RootCA File does not Exists", "exists": False}
+
+    def delete(self, name):
+        path = Path('static/certificates/' + name + '/root-CA.crt')
+        try:
+            path.unlink()
+            return {"message": "RootCA file Deleted."}
+        except Exception as error:
+            return {"message": error}
+
+
+class CertificateFileCheck(Resource):
+    def get(self, name):
+        path = Path('static/certificates/' + name + '/' + name + '.cert.pem')
+        result = path.exists()
+        if result == True:
+            return {"message": "Certificate File Exists", "exists": True}, 200
+        else:
+            return {"message": "Certificate File does not Exists", "exists": False}
+
+    def delete(self, name):
+        path = Path('static/certificates/' + name + '/' + name + '.cert.pem')
+        try:
+            path.unlink()
+            return {"message": "Certificate file Deleted."}
+        except Exception as error:
+            return {"message": error}
+
+
+class PrivateKeyFileCheck(Resource):
+    def get(self, name):
+        path = Path('static/certificates/' + name +
+                    '/' + name + '.private.key')
+        result = path.exists()
+        if result == True:
+            return {"message": "Private Key File Exists", "exists": True}, 200
+        else:
+            return {"message": "Private Key does not Exists", "exists": False}
+
+    def delete(self, name):
+        path = Path('static/certificates/' + name +
+                    '/' + name + '.private.key')
+        try:
+            path.unlink()
+            return {"message": "Private Key file Deleted."}
         except Exception as error:
             return {"message": error}
